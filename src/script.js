@@ -2,10 +2,7 @@
 
 // ステップ1:4つの係数からモニック4次方程式の実数解を
 // vec4形式で取得する（ない場合はどうせ使わない-1.0で補間して返す）
-// ステップ2:4つの係数をトーラスの情報から構成する関数を作る
-// （ここをいじれば他の4次曲面でも同じようにできるはず）
-// 余談だけど多分メンガースポンジは一定距離ずつ進むレイマで書いてそう
-// ステップ3:実数解ベクトルの成分のうち正で最小のものをtとして採用。
+// ステップ2:実数解ベクトルの成分のうち正で最小のものをtとして採用。
 // これでgetTorus()の返り値とする。
 
 let myShader;
@@ -155,7 +152,7 @@ let fs =
 // x^4 + 4(k3)x^3 + 4(k2)x^2 + 8(k1)x + 4(k0) = 0の解を求める
 "vec4 solve4(float k3, float k2, float k1, float k0){" +
 // あらかじめ-1.0で埋めておいて解が見つかったら置き換える感じ。
-// どうせ正の数しか使わないでしょ
+// どうせ正の数しか使わない
 "  vec4 ans = vec4(-1.0);" +
 // 変数変換してx^3の係数をなくす処理
 // 具体的には解の和が0になるようにグラフの平行移動をしている
@@ -177,7 +174,7 @@ let fs =
 "    }" +
 "    return ans;" +
 "  }" +
-// 以下では|c1| > 0.0とする。続きは、帰ってから（えー）
+// 以下では|c1| > 0.0とする。
 "  float q = c0 + c2 * c2;" +
 "  float r = c1 * c1 + c2 * c2 * c2 - 3.0 * c0 * c2;" +
 // q, rに対して4x^3 - qx = rの解のうち最大の実数値を取る
@@ -226,17 +223,12 @@ let fs =
 "  return t;" +
 "}" +
 // 法線取得(pはトーラス上であることを仮定）
-// 一般の4次曲面ではこうするしかないわけですが・・
-// 方程式F(x) = (x^2 + y^2 + z^2 + a^2 - b^2)^2 - 4a^2(x^2 + y^2) = 0
-// に対して関数Fのナブラベクトル∇F(p)の正規化を取っていますね。
-// 傾きを考慮してないので普通にやりましょうね。
 "vec3 getNormalOfTorus(vec3 p, vec3 c, vec3 n, float a, float b){" +
 "  vec3 q = c + normalize((p - c) - dot(p - c, n) * n) * a;" +
-// bで割るとかインチキしないで普通に正規化しましょう。
+// 普通に正規化.
 "  return normalize(p - q);" +
 "}" +
-// tが取得できたのでトーラスを描画します。法線はどうしよう・・
-// out忘れてた。描画できたが・・むぅぅ。
+// tが取得できたのでトーラスを描画します。
 "void drawTorus(out vec4 drawer, vec3 ori, vec3 dir, vec3 c, vec3 n, float a, float b, vec3 bodyColor){" +
 "  float t = getTorus(ori, dir, c, n, a, b);" +
 "  if(t < 0.0 || t > drawer.w){ return; }" +
@@ -263,7 +255,7 @@ let fs =
 "  vec3 color = getBackground(ori, dir);" +
 // これ以降はcolorとtを一つ組にしたdrawerというのを用意して使い回す。
 // 今までのtは第4成分となる感じ。
-"  vec4 drawer = vec4(color, 99999.9);" +
+"  vec4 drawer = vec4(color, 1e20);" +
 "  float alpha = pi * 0.1;" +
 "  float theta = u_time * pi;" +
 "  vec3 c0 = vec3(0.0, 5.0, 0.0);" +
@@ -296,7 +288,7 @@ class CameraModule{
     this.cameraPos = createVector(20.0, 20.0);
     this.yaw = Math.PI;
     this.cameraSpeed = 0.3;
-    this.cameraHeight = 2.0;
+    this.cameraHeight = 4.0;
   }
   update(){
     this.yaw = constrain(mouseX / width, 0.0, 1.0) * 4.0 * Math.PI;
